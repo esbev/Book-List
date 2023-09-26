@@ -3,13 +3,13 @@ const { User } = require('../models');
 
 const resolvers = {
   Query: {
-    user: async (parent, { userId }) => {
+    me: async (parent, { userId }) => {
       return User.findOne({ _id: userId });
     }
   },
 
   Mutation: {
-    login: async (parent, { email, password }) => {
+    loginUser: async (parent, { email, password }) => {
       const user = await User.findOne({ email });
 
       if (!user) {
