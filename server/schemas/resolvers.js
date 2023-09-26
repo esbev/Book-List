@@ -33,7 +33,7 @@ const resolvers = {
       return { token, user };
     },
 
-    addBook: async (parent, { userId, bookId }) => {
+    saveBook: async (parent, { userId, bookId }) => {
       return User.findOneAndUpdate(
         { _id: userId },
         {
@@ -46,7 +46,7 @@ const resolvers = {
       );
     },
 
-    removeSkill: async (parent, { userId, bookId }) => {
+    removeBook: async (parent, { userId, bookId }) => {
       return User.findOneAndUpdate(
         { _id: userId },
         { $pull: { savedBooks: bookId } },
