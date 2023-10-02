@@ -3,8 +3,11 @@ const { User } = require('../models');
 
 const resolvers = {
   Query: {
-    me: async (parent, { userId }) => {
-      return User.findOne({ _id: userId });
+    // me: async (parent, { userId }) => {
+    //   return User.findOne({ _id: userId });
+    // }
+    me: async (parent, { email }) => {
+      return User.findOne({ email: email });
     }
   },
 
@@ -33,25 +36,32 @@ const resolvers = {
       return { token, user };
     },
 
-    saveBook: async (parent, { userId, bookId }) => {
-      return User.findOneAndUpdate(
-        { _id: userId },
-        {
-          $addToSet: { savedBooks: bookId },
-        },
-        {
-          new: true,
-          runValidators: true,
-        }
-      );
+    saveBook: async (parent, { userId, bookId }, context) => {
+      if (context.user) {
+        return User.findOneAndUpdate(
+          { _id: userId },
+          {
+            $addToSet: { savedBooks: bookId },
+          },
+          {
+            new: true,
+            runValidators: true,
+          }
+        );
+      }
+
+      throw AuthenticationError;
     },
 
-    removeBook: async (parent, { userId, bookId }) => {
-      return User.findOneAndUpdate(
-        { _id: userId },
-        { $pull: { savedBooks: bookId } },
-        { new: true }
-      );
+    removeBook: async (parent, { userId, bookId }, context) => {
+      if (context.user) {
+        return User.findOneAndUpdate(
+          { _id: userId },
+          { $pull: { savedBooks: bookId } },
+          { new: true }
+        );
+      }
+      throw AuthenticationError;
     },
   },
 };
