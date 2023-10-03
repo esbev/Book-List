@@ -3,12 +3,12 @@ const { User } = require('../models');
 
 const resolvers = {
   Query: {
-    // me: async (parent, { userId }) => {
-    //   return User.findOne({ _id: userId });
-    // }
-    me: async (parent, { email }) => {
-      return User.findOne({ email: email });
-    }
+    me: async (parent, args, context) => {
+      if (context.user) {
+        return User.findOne({ _id: context.user._id });
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
   },
 
   Mutation: {
@@ -50,18 +50,18 @@ const resolvers = {
         );
       }
 
-      throw AuthenticationError;
+      throw new AuthenticationError('You need to be logged in!');
     },
 
-    removeBook: async (parent, { userId, bookId }, context) => {
+    removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
         return User.findOneAndUpdate(
-          { _id: userId },
+          { _id: context.userId },
           { $pull: { savedBooks: bookId } },
           { new: true }
         );
       }
-      throw AuthenticationError;
+      throw new AuthenticationError('You need to be logged in!');
     },
   },
 };
