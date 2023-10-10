@@ -26,32 +26,34 @@ const SignupForm = () => {
     }
 
     try {
-      const { response } = await addUser({  variables: { userFormData }});
+      const response = await addUser({
+        variables: {
+          username: userFormData.username,
+          email: userFormData.email,
+          password: userFormData.password,
+        },
+      });
 
       if (!response.ok) {
-        throw new Error('something went wrong!');
+        throw new Error(response.error);
       }
 
-      // const { token, user } = await response.json();
-      console.log(user);
+      const { token } = response.data.addUser.token;
       Auth.login(token);
+      setUserFormData({
+        username: '',
+        email: '',
+        password: '',
+      });
     } catch (err) {
       console.error(err);
       setShowAlert(true);
     }
-
-    setUserFormData({
-      username: '',
-      email: '',
-      password: '',
-    });
   };
 
   return (
     <>
-      {/* This is needed for the validation functionality above */}
       <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
-        {/* show alert if server response is bad */}
         <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
           Something went wrong with your signup!
         </Alert>

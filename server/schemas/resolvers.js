@@ -1,4 +1,5 @@
-const { signToken } = require('../../server/utils/auth');
+const { signToken } = require('../utils/auth');
+const { AuthenticationError } = require('apollo-server-express');
 const { User } = require('../models');
 
 const resolvers = {
@@ -7,7 +8,7 @@ const resolvers = {
       if (context.user) {
         return User.findOne({ _id: context.user._id });
       }
-      throw new AuthenticationError('You need to be logged in!');
+      throw AuthenticationError('You need to be logged in!');
     },
   },
 
@@ -16,13 +17,13 @@ const resolvers = {
       const user = await User.findOne({ email });
 
       if (!user) {
-        throw new AuthenticationError('No user with this email found!');
+        throw AuthenticationError('User or password incorrect!');
       }
 
       const correctPw = await user.isCorrectPassword(password);
 
       if (!correctPw) {
-        throw new AuthenticationError('Incorrect password!');
+        throw AuthenticationError('User or password incorrect!');
       }
 
       const token = signToken(user);
@@ -50,7 +51,7 @@ const resolvers = {
         );
       }
 
-      throw new AuthenticationError('You need to be logged in!');
+      throw AuthenticationError('You need to be logged in!');
     },
 
     removeBook: async (parent, { bookId }, context) => {
@@ -61,7 +62,7 @@ const resolvers = {
           { new: true }
         );
       }
-      throw new AuthenticationError('You need to be logged in!');
+      throw AuthenticationError('You need to be logged in!');
     },
   },
 };
